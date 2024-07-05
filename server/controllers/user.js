@@ -45,6 +45,8 @@ async function login(login, password) {
 async function getUsers() {
   const users = await User.find();
 
+  console.log(users);
+
   return users;
 }
 

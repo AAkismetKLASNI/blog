@@ -15,6 +15,8 @@ const UsersContainer = ({ className }) => {
 	const [switchDeleteUser, setSwitchDeleteUser] = useState(false);
 	const userRole = useSelector(roleIdSelector);
 
+	console.log(users);
+
 	useEffect(() => {
 		if (!checkAccess([ROLES.ADMIN], userRole)) {
 			return;
@@ -34,6 +36,8 @@ const UsersContainer = ({ className }) => {
 				setErrorFetch(rolesRes.error || usersRes.error);
 				return;
 			}
+
+			console.log('usersRes.data.data', usersRes.data.data);
 
 			setRoles(rolesRes.data.data);
 			setUsers(usersRes.data.data);
