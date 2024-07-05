@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const sign = 'testpassword';
+const sign = process.env.JWT_SECRET;
 
 module.exports = {
   generate: function (data) {
