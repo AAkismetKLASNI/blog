@@ -34,7 +34,7 @@ router.get('/:id', async (req, res) => {
 router.post('/', authenticated, hasRole([ROLES.ADMIN]), async (req, res) => {
   const post = await addPost({
     title: req.body.title,
-    image: req.body.image,
+    image: req.body.imageUrl,
     content: req.body.content,
   });
 
@@ -80,7 +80,7 @@ router.post(
 
       res.send({ data: mapComment(comment) });
     } catch (error) {
-      res.send(error.message);
+      res.send({ error: error.message });
     }
   }
 );

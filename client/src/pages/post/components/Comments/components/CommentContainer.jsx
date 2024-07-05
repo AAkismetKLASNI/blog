@@ -5,7 +5,6 @@ import {
 	CLOSE_MODAL,
 	openModal,
 } from '../../../../../actions';
-import { useServerRequest } from '../../../../../hooks';
 import { postIdSelector, roleIdSelector } from '../../../../../selectors';
 import { ROLES } from '../../../../../constants';
 import PropTypes from 'prop-types';
@@ -15,14 +14,13 @@ const CommentContainer = ({ className, content, id, publishedAt, author }) => {
 	const dispatch = useDispatch();
 	const postId = useSelector(postIdSelector);
 	const roleId = useSelector(roleIdSelector);
-	const requestServer = useServerRequest();
 
 	const onDeleteComment = (commentId) => {
 		dispatch(
 			openModal({
 				questionText: 'Вы действительно хотите удалить комментарий?',
 				onConfirm: () => {
-					dispatch(removeCommentAsync(requestServer, commentId, postId));
+					dispatch(removeCommentAsync(commentId, postId));
 					dispatch(CLOSE_MODAL);
 				},
 				onCancel: () => dispatch(CLOSE_MODAL),

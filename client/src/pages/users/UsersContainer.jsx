@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { H2, Content } from '../../ui-components';
 import { User } from './components/UserLayout';
-import { useServerRequest } from '../../hooks';
-import { ROLES } from '../../bff/constants';
+import { ROLES } from '../../constants';
 import { checkAccess } from '../../utils/check-access';
 import { useSelector } from 'react-redux';
-import styled from 'styled-components';
 import { roleIdSelector } from '../../selectors';
+import axios from 'axios';
+import styled from 'styled-components';
 
 const UsersContainer = ({ className }) => {
 	const [roles, setRoles] = useState([]);
@@ -14,7 +14,6 @@ const UsersContainer = ({ className }) => {
 	const [errorFetch, setErrorFetch] = useState(null);
 	const [switchDeleteUser, setSwitchDeleteUser] = useState(false);
 	const userRole = useSelector(roleIdSelector);
-	const requestServer = useServerRequest();
 
 	useEffect(() => {
 		if (!checkAccess([ROLES.ADMIN], userRole)) {
@@ -22,27 +21,36 @@ const UsersContainer = ({ className }) => {
 		}
 
 		Promise.all([
-			requestServer('fetchRoles'),
-			requestServer('fetchUsers'),
+			axios.get('http://localhost:3500/users/roles', {
+				withCredentials: true,
+				credentials: 'include',
+			}),
+			axios.get('http://localhost:3500/users', {
+				withCredentials: true,
+				credentials: 'include',
+			}),
 		]).then(([rolesRes, usersRes]) => {
 			if (rolesRes.error || usersRes.error) {
 				setErrorFetch(rolesRes.error || usersRes.error);
 				return;
 			}
 
-			setRoles(rolesRes.res);
-			setUsers(usersRes.res);
+			setRoles(rolesRes.data.data);
+			setUsers(usersRes.data.data);
 		});
-	}, [requestServer, switchDeleteUser, userRole]);
+	}, [switchDeleteUser, userRole]);
 
 	const onDeleteUser = (userId) => {
 		if (!checkAccess([ROLES.ADMIN], userRole)) {
 			return;
 		}
 
-		requestServer('requestDeleteUser', userId).then(() =>
-			setSwitchDeleteUser(!switchDeleteUser),
-		);
+		axios
+			.delete(`http://localhost:3500/users/${userId}`, {
+				withCredentials: true,
+				credentials: 'include',
+			})
+			.then(() => setSwitchDeleteUser(!switchDeleteUser));
 	};
 
 	return (

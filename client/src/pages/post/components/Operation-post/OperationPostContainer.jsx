@@ -1,5 +1,4 @@
 import { Icon } from '../../../../ui-components';
-import { useServerRequest } from '../../../../hooks';
 import { CLOSE_MODAL, removePostAsync, openModal } from '../../../../actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -16,7 +15,6 @@ const OperationPostContainer = ({
 }) => {
 	const roleId = useSelector(roleIdSelector);
 	const dispatch = useDispatch();
-	const requestServer = useServerRequest();
 	const navigate = useNavigate();
 
 	const onDeletePost = (id) => {
@@ -24,9 +22,7 @@ const OperationPostContainer = ({
 			openModal({
 				questionText: 'Вы действительно хотите удалить пост',
 				onConfirm: () => {
-					dispatch(removePostAsync(requestServer, id)).then(() =>
-						navigate('/'),
-					);
+					dispatch(removePostAsync(id)).then(() => navigate('/'));
 					dispatch(CLOSE_MODAL);
 				},
 				onCancel: () => dispatch(CLOSE_MODAL),

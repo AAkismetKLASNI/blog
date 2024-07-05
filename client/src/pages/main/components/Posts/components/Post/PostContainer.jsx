@@ -9,7 +9,7 @@ const PostContainer = ({
 	imageUrl,
 	publishedAt,
 	id,
-	countComments,
+	comments,
 }) => {
 	return (
 		<li className={className}>
@@ -33,7 +33,7 @@ const PostContainer = ({
 							aria-hidden="true"
 							unactive={true}
 						/>
-						{countComments}
+						{comments}
 					</div>
 				</div>
 			</div>
@@ -80,5 +80,5 @@ Post.propTypes = {
 	imageUrl: PropTypes.string.isRequired,
 	publishedAt: PropTypes.string.isRequired,
 	id: PropTypes.string.isRequired,
-	countComments: PropTypes.number.isRequired,
+	comments: PropTypes.number.isRequired,
 };

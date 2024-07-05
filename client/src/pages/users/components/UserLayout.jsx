@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Icon } from '../../../ui-components';
-import { useServerRequest } from '../../../hooks';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import axios from 'axios';
 
 const UserContainer = ({
 	id,
@@ -22,12 +22,16 @@ const UserContainer = ({
 	const isSaveButtonDisabled = selectedRole === initialRole;
 
 	const onChangeRole = () => {
-		requestServer('updateUserRole', id, selectedRole).then(() =>
-			setInitialRole(selectedRole),
-		);
+		axios
+			.patch(
+				`http://localhost:3500/users/${id}`,
+				{ roleId: selectedRole },
+				{ withCredentials: true, credentials: 'include' },
+			)
+			.then(() => {
+				setInitialRole(selectedRole);
+			});
 	};
-
-	const requestServer = useServerRequest();
 
 	return (
 		<li className="table-item">
@@ -68,6 +72,6 @@ User.propTypes = {
 	login: PropTypes.string.isRequired,
 	registeredAt: PropTypes.string.isRequired,
 	roles: PropTypes.array.isRequired,
-	roleId: PropTypes.string.isRequired,
+	roleId: PropTypes.number.isRequired,
 	onDeleteUser: PropTypes.func.isRequired,
 };

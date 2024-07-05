@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useServerRequest } from '../../../../hooks';
 import { Post } from './components';
 import { PAGINATION_LIMIT } from '../../../../constants';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import axios from 'axios';
 
 const PostsContainer = ({
 	className,
@@ -14,24 +14,28 @@ const PostsContainer = ({
 }) => {
 	const [posts, setPosts] = useState([]);
 	const [loading, setLoading] = useState(false);
-	const requestServer = useServerRequest();
 
 	useEffect(() => {
-		requestServer(
-			'fetchPosts',
-			page,
-			PAGINATION_LIMIT,
-			searchBarPhrase.toLowerCase(),
-		).then(({ error, res }) => {
-			if (error) {
-				return;
-			}
-
-			setLastPage(res.last);
-			setPosts(res.posts);
-			setLoading(true);
-		});
-	}, [requestServer, page, switchReadyPhrase]);
+		axios
+			.get(
+				`http://localhost:3500/posts?search=${searchBarPhrase}&page=${page}&limit=${PAGINATION_LIMIT}`,
+			)
+			.then(({ status, data: { data } }) => {
+				if (status === 200) {
+					const { lastPage, posts } = data;
+					setLastPage(lastPage);
+					setPosts(posts);
+					setLoading(true);
+				}
+			});
+	}, [
+		page,
+		switchReadyPhrase,
+		setLastPage,
+		setPosts,
+		setLoading,
+		searchBarPhrase,
+	]);
 
 	return (
 		<div className={className}>
@@ -39,18 +43,16 @@ const PostsContainer = ({
 				<>
 					{posts.length ? (
 						<ul className="test">
-							{posts.map(
-								({ title, imageUrl, id, publishedAt, countComments }) => (
-									<Post
-										key={id}
-										title={title}
-										imageUrl={imageUrl}
-										publishedAt={publishedAt}
-										id={id}
-										countComments={countComments}
-									/>
-								),
-							)}
+							{posts.map(({ title, imageUrl, id, publishedAt, comments }) => (
+								<Post
+									key={id}
+									title={title}
+									imageUrl={imageUrl}
+									publishedAt={publishedAt}
+									comments={comments.length}
+									id={id}
+								/>
+							))}
 						</ul>
 					) : (
 						<div>

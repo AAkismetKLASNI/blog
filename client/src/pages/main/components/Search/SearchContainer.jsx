@@ -12,8 +12,8 @@ const SearchContainer = ({
 	setSwitchReadyPhrase,
 }) => {
 	const startDelayedSearch = useMemo(
-		() => debounce(setSwitchReadyPhrase, 2000),
-		[],
+		() => debounce(setSwitchReadyPhrase, 1000),
+		[setSwitchReadyPhrase],
 	);
 
 	const onChangeSearchBar = ({ target }) => {

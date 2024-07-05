@@ -6,7 +6,8 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setUserAction } from '../../actions';
 import { useNavigate } from 'react-router-dom';
-import { useResetForm, useServerRequest } from '../../hooks';
+import { useResetForm } from '../../hooks';
+import axios from 'axios';
 
 const registrationSceme = yup.object().shape({
 	login: yup
@@ -44,8 +45,6 @@ export const RegistrationContainerPage = () => {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
-	const requestServer = useServerRequest();
-
 	const formError =
 		errors?.login?.message ||
 		errors?.password?.message ||
@@ -53,17 +52,24 @@ export const RegistrationContainerPage = () => {
 	const error = serverError || formError;
 
 	const onSubmit = ({ login, password }) => {
-		requestServer('register', login, password).then(({ error, res }) => {
-			if (error) {
-				setServerError(error);
-				return;
-			}
+		axios
+			.post(
+				'http://localhost:3500/register',
+				{ login, password },
+				{ withCredentials: true, credentials: 'include' },
+			)
+			.then(({ status, data: { error, user } }) => {
+				if (error) {
+					setServerError(error);
+					return;
+				}
 
-			dispatch(setUserAction(res));
-			sessionStorage.setItem('userData', JSON.stringify(res));
-
-			navigate('/');
-		});
+				if (status === 200) {
+					dispatch(setUserAction(user));
+					sessionStorage.setItem('userData', JSON.stringify(user));
+					navigate('/');
+				}
+			});
 	};
 
 	return (

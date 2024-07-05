@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { OperationPost } from '../Operation-post/OperationPostContainer';
 import { sanitizeContent } from './utils/sanitizeContent';
 import { savePostAsync } from '../../../../actions';
-import { useServerRequest } from '../../../../hooks';
 import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -23,20 +22,20 @@ const PostEditContainer = ({
 	}, [imageUrl, title]);
 
 	const dispatch = useDispatch();
-	const requestServer = useServerRequest();
 	const navigate = useNavigate();
 
 	const onSave = () => {
 		const newContent = sanitizeContent(contentRef.current.innerHTML);
 
 		dispatch(
-			savePostAsync(requestServer, {
-				id,
+			savePostAsync(id, {
 				title: titlePost,
 				imageUrl: imagePost,
 				content: newContent,
 			}),
-		).then(({ id }) => navigate(`/post/${id}`));
+		).then(({ id }) => {
+			navigate(`/post/${id}`);
+		});
 	};
 
 	const onChangeImage = ({ target }) => setImagePost(target.value);

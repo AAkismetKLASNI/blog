@@ -6,7 +6,8 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setUserAction } from '../../actions';
 import { useNavigate } from 'react-router-dom';
-import { useResetForm, useServerRequest } from '../../hooks';
+import { useResetForm } from '../../hooks';
+import axios from 'axios';
 
 const authorizationSceme = yup.object().shape({
 	login: yup
@@ -40,23 +41,28 @@ export const AuthorizationContainerPage = () => {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
-	const requestServer = useServerRequest();
-
 	const formError = errors?.login?.message || errors?.password?.message;
 	const error = serverError || formError;
 
-	const onSubmit = ({ login, password }) => {
-		requestServer('authorize', login, password).then(({ error, res }) => {
-			if (error) {
-				setServerError(error);
-				return;
-			}
+	const onSubmit = async ({ login, password }) => {
+		axios
+			.post(
+				'http://localhost:3500/login',
+				{ login, password },
+				{ withCredentials: true, credentials: 'include' },
+			)
+			.then(({ status, data: { error, user } }) => {
+				if (error) {
+					setServerError(error);
+					return;
+				}
 
-			dispatch(setUserAction(res));
-			sessionStorage.setItem('userData', JSON.stringify(res));
-
-			navigate('/');
-		});
+				if (status === 200) {
+					dispatch(setUserAction(user));
+					sessionStorage.setItem('userData', JSON.stringify(user));
+					navigate('/');
+				}
+			});
 	};
 
 	return (

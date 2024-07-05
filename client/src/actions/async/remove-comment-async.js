@@ -1,11 +1,17 @@
-import { setLoadPost } from '../index';
+import { removeComment } from '../index';
+import axios from 'axios';
 
-export const removeCommentAsync =
-	(requestServer, commentId, postId) => (dispatch) =>
-		requestServer('removeComment', commentId, postId).then(({ error, res }) => {
+export const removeCommentAsync = (commentId, postId) => (dispatch) => {
+	axios
+		.delete(`http://localhost:3500/posts/${postId}/comments/${commentId}`, {
+			withCredentials: true,
+			credentials: 'include',
+		})
+		.then(({ data: { error } }) => {
 			if (error) {
 				return;
 			}
 
-			dispatch(setLoadPost(res));
+			dispatch(removeComment(commentId));
 		});
+};
